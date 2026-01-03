@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>安全检测</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: #0b0b0b;
+    color: #fff;
+    font-family: system-ui, Arial;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+button {
+    font-size: 18px;
+    padding: 14px 26px;
+    border-radius: 8px;
+    border: none;
+    background: #2196f3;
+    color: white;
+    position: absolute;
+}
+
+#tip {
+    opacity: 0.7;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>安卓设备安全检测</h2>
+<p id="tip">请点击下方按钮开始</p>
+
+<button id="btn">开始检测</button>
+
+<script>
+const btn = document.getElementById("btn");
+const tip = document.getElementById("tip");
+
+let activated = false;
+
+// 循环声音（点一次后停不下）
+const audio = new Audio("beep.mp3");
+audio.loop = true;
+audio.volume = 0.7;
+
+// 按钮躲避手指
+btn.addEventListener("touchstart", (e) => {
+    if (!activated) {
+        const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+        const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+        btn.style.left = x + "px";
+        btn.style.top = y + "px";
+        navigator.vibrate?.(40);
+        e.preventDefault();
+    }
+});
+
+// 真正点到
+btn.addEventListener("click", () => {
+    if (activated) return;
+    activated = true;
+
+    audio.play();
+    navigator.vibrate?.([100, 50, 100]);
+
+    tip.innerText = "正在扫描系统异常…";
+    btn.style.display = "none";
+
+    let percent = 0;
+
+    const fakeScan = setInterval(() => {
+        percent += Math.random() * 8;
+        if (percent > 99) percent = 99;
+
+        tip.innerText = `检测中… ${percent.toFixed(0)}%`;
+
+        if (percent > 80) {
+            tip.innerText = "即将完成，请勿关闭页面";
+        }
+
+        if (percent >= 99) {
+            clearInterval(fakeScan);
+            setTimeout(prankEnd, 1500);
+        }
+    }, 500);
+});
+
+function prankEnd() {
+    document.body.innerHTML = `
+        <h1>😂 你被整了</h1>
+        <p>这是一个安卓整人链接</p>
+        <p style="opacity:0.7">
+        · 声音会一直放<br>
+        · 震动是真的<br>
+        · 但什么都没坏 😎
+        </p>
+        <p style="opacity:0.5">关掉页面即可解脱</p>
+    `;
+    navigator.vibrate?.([200,100,200,100,300]);
+}
+</script>
+
+</body>
+</html>
